@@ -4,6 +4,7 @@ import dotenv from "dotenv"
 import authRoutes from "./routes/auth.routes.js"
 import cookieParser from "cookie-parser"
 import userRoutes from "./routes/user.route.js"
+import travelStoryRoutes from "./routes/travelStory.route.js"
 
 dotenv.config()
 mongoose.connect(process.env.MONGO_URI).then(
@@ -28,6 +29,7 @@ app.listen(3000,()=>{
 
 app.use("/api/auth", authRoutes)
 app.use("/api/user", userRoutes)
+app.use("/api/travel-story", travelStoryRoutes)
 
 
 
