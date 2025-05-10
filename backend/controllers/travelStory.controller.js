@@ -42,3 +42,15 @@ export const getAllTravelStory= async(request, response, next )=>{
       next(error)  
     }
 }
+export const imageUpload = async(request, response, next)=>{
+    try {
+        if(!request.file){
+            return next(errorHandler(400, "No image uploaded"))
+        }
+        const imageUrl= `http://localhost:3000/uploads/${request.file.filename}`
+
+        response.status(201).json({ imageUrl })
+    } catch (error) {
+        next(error)
+    }
+}
