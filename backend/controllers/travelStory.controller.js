@@ -1,6 +1,9 @@
 import { response } from "express"
 import TravelStory from "../models/travelStory.model.js"
 import { errorHandler } from "../utils/error.js"
+import path from "path"
+import { fileURLToPath } from "url"
+import fs from "fs"
 
 export const addTravelStory = async(request, response, next)=>{
 const { title, story, visitedLocation, imageUrl, visitedDate }= request.body
@@ -50,6 +53,29 @@ export const imageUpload = async(request, response, next)=>{
         const imageUrl= `http://localhost:3000/uploads/${request.file.filename}`
 
         response.status(201).json({ imageUrl })
+    } catch (error) {
+        next(error)
+    }
+}
+const __filename= fileURLToPath(import.meta.url)
+const __dirname=path.dirname(__filename)
+const rootDir =path.join(__dirname, "..")
+export const deleteImage= async(request,response,next) =>{
+    const{imageUrl} = request.query
+    if(!imageUrl){
+        return next(errorHandler(400, "imageUrl parameter is required"))
+    }
+    try {
+        const filename= path.basename(imageUrl)
+
+        const filePath=path.join(rootDir, "uploads", filename)
+
+        console.log(filePath)
+        if(!fs.existsSync(filePath)){
+            return next(errorHandler(404, "image not found!"))
+        } 
+        await fs.promises.unlink(filePath)
+        response.status(200),json({message: "Image Deleted Successfully!"})
     } catch (error) {
         next(error)
     }
