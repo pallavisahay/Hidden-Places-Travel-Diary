@@ -1,3 +1,4 @@
+import { response } from "express"
 import TravelStory from "../models/travelStory.model.js"
 import { errorHandler } from "../utils/error.js"
 
@@ -29,4 +30,15 @@ try {
 } catch (error) {
   next(error)  
 }
+}
+export const getAllTravelStory= async(request, response, next )=>{
+    const userId=request.user.id
+    try {
+        const travelStories= await TravelStory.find({userId : userId}).sort({
+            isFavourite : -1,
+        })
+        response.status(200).json({stories : travelStories })
+    } catch (error) {
+      next(error)  
+    }
 }
