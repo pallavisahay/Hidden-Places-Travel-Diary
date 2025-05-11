@@ -171,3 +171,19 @@ try {
     next(error)
 }
 }
+export const filterTravelStories= async(request, response, next)=>{
+const {startDate, endDate}=request.query
+const userId=request.user.id
+try {
+    const start = new Date(parseInt(startDate))
+    const end = new Date(parseInt(endDate))
+    const filteredStories = await TravelStory.find({
+        userId : userId,
+        visitedDate :  {$gte: start, $lte : end},
+    }).sort({isFavourite: -1})
+    response.status(200).json({stories : filteredStories})
+
+} catch (error) {
+    next(error)
+}
+}
