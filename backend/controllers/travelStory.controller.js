@@ -111,3 +111,26 @@ try {
    next(error) 
 }
 }
+export const deleteTravelStory= async(request, response, next)=>{
+    const { id }=request.params
+    const userId = request.user.id
+    try {
+        const travelStory = await TravelStory.findOne({_id :id, userId: userId})
+         if(!travelStory){
+       return next(errorHandler(404, "Travel Story not found!"))
+    }
+    await travelStory.deleteOne()
+        const imageUrl=travelStory.imageUrl
+const filename= path.basename(imageUrl)
+const filePath=path.join(rootDir, "uploads" , filename)
+
+if(!fs.existsSync(filePath)){
+    return next(errorHandler(404, "image not found"))
+
+}
+await fs.promises.unlink(filePath)
+response.status(200).json({message : "travel story deleted successfully"})
+    } catch (error) {
+       next(error) 
+    }
+} 
