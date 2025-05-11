@@ -151,3 +151,23 @@ export const updateIsFavourite = async(request, response, next)=>{
         next(error)
     }
 }
+export const searchTravelStory= async(request, response, next)=>{
+const {query} = request.query
+const userId = request.user.id
+if(!query){
+    return next(errorHandler(404, "Query is required"))
+}
+try {
+    const searchResult= await TravelStory.find({
+        userId: userId,
+        $or : [
+            {title : {$regex : query, $options : "i"}},
+            {story : {$regex : query, $options : "i"}},
+            {visitedLocation : {$regex : query, $options : "i"}}
+        ]
+    }).sort({isFavourite : -1})
+    response.status(200).json({stories : searchResult,})
+} catch (error) {
+    next(error)
+}
+}
