@@ -5,6 +5,8 @@ import path from "path"
 import { fileURLToPath } from "url"
 import fs from "fs"
 
+
+
 export const addTravelStory = async(request, response, next)=>{
 const { title, story, visitedLocation, imageUrl, visitedDate }= request.body
 
@@ -79,4 +81,33 @@ export const deleteImage= async(request,response,next) =>{
     } catch (error) {
         next(error)
     }
+}
+export const editTravelStory = async(request, response, next)=>{
+    const {id}=request.params
+    const {title, story, visitedLocation, imageUrl, visitedDate} = request.body
+    const userId= request.user.id
+
+    if(!title || !story || !visitedLocation || !imageUrl || !visitedDate){
+    return next(errorHandler(400, "All fields are required"))
+}
+const parsedVisitedDate= new Date(parseInt(visitedDate))
+try {
+    const travelStory = await TravelStory.findOne({_id :id, userId: userId})
+    if(!travelStory){
+       return next(errorHandler(404, "Travel Story not found!"))
+    }
+    const placeholderImageUrl = `http://localhost:3000/assets/placeholderImage.jpeg`
+    travelStory.title=title 
+    travelStory.story=story
+    travelStory.visitedLocation=visitedLocation
+    travelStory.imageUrl=imageUrl || placeholderImageUrl
+    travelStory.visitedDate=parsedVisitedDate
+    await  travelStory.save()
+    response.status(200).json({
+        story : travelStory,
+        message : "Travel Story Updated SuccessFully!"
+    })
+} catch (error) {
+   next(error) 
+}
 }
