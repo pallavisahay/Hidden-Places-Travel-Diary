@@ -4,6 +4,7 @@ import { errorHandler } from "../utils/error.js"
 import path from "path"
 import { fileURLToPath } from "url"
 import fs from "fs"
+import { request } from "http"
 
 
 
@@ -134,3 +135,19 @@ response.status(200).json({message : "travel story deleted successfully"})
        next(error) 
     }
 } 
+export const updateIsFavourite = async(request, response, next)=>{
+    const {id} =request.params
+    const{isFavourite}=request.body
+    const userId=request.user.id
+    try {
+     const travelStory= await TravelStory.findOne({_id:id, userId : userId})  
+     if(!travelStory){
+        return next(errorHandler(404, "Travel Story not found"))
+     } 
+     travelStory.isFavourite=isFavourite
+     await travelStory.save()
+     response.status(200).json({story : travelStory, message : "updated Successfully"})
+    } catch (error) {
+        next(error)
+    }
+}
